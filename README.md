@@ -46,16 +46,10 @@ npm install @omidteimoori/node-red-object-explorer
 
 Then restart Node-RED and refresh the editor.
 
-## Local Installation From Source
+## Supported Versions
 
-If installing from a local folder or cloned repository:
-
-```bash
-cd ~/.node-red
-npm install "/absolute/path/to/node-red-object-explorer"
-```
-
-Then restart Node-RED and refresh the editor.
+- Node-RED: `>=3.0.0`
+- Node.js: `>=16.0.0`
 
 ## Usage
 
@@ -69,6 +63,10 @@ Then restart Node-RED and refresh the editor.
 5. Choose the mode
 6. Choose the output format
 7. Optionally enter a search term
+
+## Example Flow
+
+The package includes a small example flow in the `examples` folder. In Node-RED, open the import menu and look under the **Examples** section for **Basic Object Exploration**.
 
 ## Modes
 

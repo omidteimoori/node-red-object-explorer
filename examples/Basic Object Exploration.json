@@ -1,0 +1,124 @@
+[
+  {
+    "id": "f4f4d830bbcd9181",
+    "type": "tab",
+    "label": "Basic Object Exploration",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "fb26bc1bf42666db",
+    "type": "comment",
+    "z": "f4f4d830bbcd9181",
+    "name": "Example",
+    "info": "Inject a sample object and explore the direct keys under msg.payload.",
+    "x": 140,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "8dbd5cdff573e8d9",
+    "type": "inject",
+    "z": "f4f4d830bbcd9181",
+    "name": "Run example",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 120,
+    "y": 120,
+    "wires": [
+      [
+        "21e21f7784f2466b"
+      ]
+    ]
+  },
+  {
+    "id": "21e21f7784f2466b",
+    "type": "function",
+    "z": "f4f4d830bbcd9181",
+    "name": "Create sample object",
+    "func": "msg.payload = {\n    deviceA: {\n        status: \"online\",\n        topics: {\n            temperature: 21.5,\n            humidity: 48\n        }\n    },\n    deviceB: {\n        status: \"offline\",\n        topics: {\n            temperature: 19.8,\n            humidity: 52\n        }\n    }\n};\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 310,
+    "y": 120,
+    "wires": [
+      [
+        "de34b03dab5d2902"
+      ]
+    ]
+  },
+  {
+    "id": "de34b03dab5d2902",
+    "type": "object-explorer",
+    "z": "f4f4d830bbcd9181",
+    "name": "Get payload keys",
+    "source": "msg",
+    "path": "payload",
+    "mode": "direct_keys",
+    "outputMode": "selected_array",
+    "selectionType": "key",
+    "searchTerm": "",
+    "recursive": false,
+    "exactMatch": false,
+    "caseSensitive": false,
+    "includeArrays": true,
+    "includeValues": true,
+    "x": 510,
+    "y": 120,
+    "wires": [
+      [
+        "4fa8758bbaf72c0f"
+      ],
+      [
+        "4d2fb81a82a5db53"
+      ]
+    ]
+  },
+  {
+    "id": "4fa8758bbaf72c0f",
+    "type": "debug",
+    "z": "f4f4d830bbcd9181",
+    "name": "Result",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 690,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "4d2fb81a82a5db53",
+    "type": "debug",
+    "z": "f4f4d830bbcd9181",
+    "name": "Status",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 690,
+    "y": 140,
+    "wires": []
+  }
+]
