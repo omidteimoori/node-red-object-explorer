@@ -1,6 +1,6 @@
 {
   "name": "@omidteimoori/node-red-object-explorer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A reusable Node-RED node for safely exploring nested objects from msg, flow, and global context.",
   "license": "MIT",
   "author": "Omid Teimoori",
