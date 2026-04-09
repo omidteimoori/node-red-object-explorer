@@ -1,0 +1,254 @@
+<script type="text/javascript">
+  RED.nodes.registerType("object-explorer", {
+    category: "function",
+    color: "#CDE7F7",
+    defaults: {
+      name: { value: "" },
+      source: { value: "msg", required: true },
+      path: { value: "payload", required: true },
+      mode: { value: "direct_keys", required: true },
+      outputMode: { value: "selected_array", required: true },
+      selectionType: { value: "key", required: true },
+      searchTerm: { value: "" },
+      recursive: { value: true },
+      exactMatch: { value: false },
+      caseSensitive: { value: false },
+      includeArrays: { value: true },
+      includeValues: { value: true }
+    },
+    inputs: 1,
+    outputs: 2,
+    icon: "font-awesome/fa-sitemap",
+    paletteLabel: "object explorer",
+    oneditprepare: function oneditprepare() {
+      const modeField = $("#node-input-mode");
+      const selectionField = $("#node-input-selectionType");
+      const currentSelection = this.selectionType || "key";
+
+      function selectionOptionsForMode(mode) {
+        if (mode === "direct_keys" || mode === "deep_keys" || mode === "matching_keys") {
+          return [
+            { value: "key", label: "key only" },
+            { value: "path", label: "full path only" }
+          ];
+        }
+
+        if (mode === "direct_values" || mode === "deep_values" || mode === "matching_values") {
+          return [
+            { value: "value", label: "value only" }
+          ];
+        }
+
+        return [
+          { value: "path_value", label: "path and value" },
+          { value: "key", label: "key only" },
+          { value: "path", label: "full path only" },
+          { value: "value", label: "value only" }
+        ];
+      }
+
+      function refreshSelectionOptions(preferredValue) {
+        const mode = modeField.val() || "direct_keys";
+        const options = selectionOptionsForMode(mode);
+        const allowedValues = options.map(function mapOption(option) {
+          return option.value;
+        });
+        const nextValue = allowedValues.includes(preferredValue)
+          ? preferredValue
+          : options[0].value;
+
+        selectionField.empty();
+        options.forEach(function appendOption(option) {
+          selectionField.append(
+            $("<option></option>").attr("value", option.value).text(option.label)
+          );
+        });
+        selectionField.val(nextValue);
+      }
+
+      refreshSelectionOptions(currentSelection);
+      modeField.on("change", function handleModeChange() {
+        refreshSelectionOptions(selectionField.val());
+      });
+    },
+    label: function label() {
+      return this.name || "object explorer";
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="object-explorer">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Object Explorer" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-source"><i class="fa fa-database"></i> Source</label>
+    <select id="node-input-source">
+      <option value="msg">msg</option>
+      <option value="flow">flow</option>
+      <option value="global">global</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-path"><i class="fa fa-code-fork"></i> Path</label>
+    <input
+      type="text"
+      id="node-input-path"
+      placeholder="payload.fields or variables.devices[0].topics"
+    />
+  </div>
+
+  <div class="form-tips">
+    For <code>msg</code>, use paths like <code>payload</code> or <code>payload.fields[0].name</code>.
+    For <code>flow</code> and <code>global</code>, the first path part is the context key, such as
+    <code>Datapoints</code> or <code>variables.devices[0].topics</code>.
+  </div>
+
+  <div class="form-row" style="margin-top: 6px;"></div>
+
+  <div class="form-row">
+    <label for="node-input-mode"><i class="fa fa-search"></i> Mode</label>
+    <select id="node-input-mode">
+      <option value="direct_keys">direct_keys</option>
+      <option value="deep_keys">deep_keys</option>
+      <option value="direct_values">direct_values</option>
+      <option value="deep_values">deep_values</option>
+      <option value="key_value_pairs">key_value_pairs</option>
+      <option value="matching_keys">matching_keys</option>
+      <option value="matching_values">matching_values</option>
+      <option value="matching_key_value_pairs">matching_key_value_pairs</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-searchTerm"><i class="fa fa-filter"></i> Search</label>
+    <input type="text" id="node-input-searchTerm" placeholder="topic, updatedAt, data" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-outputMode"><i class="fa fa-sign-out"></i> Output</label>
+    <select id="node-input-outputMode">
+      <option value="selected_array">selected_array</option>
+      <option value="array_strings">array of strings</option>
+      <option value="array_values">array of values</option>
+      <option value="array_key_value">array of { key, value }</option>
+      <option value="array_path_key_value">array of { path, key, value }</option>
+      <option value="dropdown_options">dropdown options</option>
+      <option value="plain_object">plain object</option>
+      <option value="first_match_only">first match only</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-selectionType"><i class="fa fa-crosshairs"></i> Selected Item</label>
+    <select id="node-input-selectionType">
+      <option value="key">key only</option>
+      <option value="path">full path only</option>
+      <option value="value">value only</option>
+      <option value="path_value">path and value</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <input type="checkbox" id="node-input-recursive" style="display:inline-block; width:auto; vertical-align:top;" />
+    <label for="node-input-recursive" style="width:70%;">Recursive search for pair and matching modes</label>
+  </div>
+
+  <div class="form-row">
+    <input type="checkbox" id="node-input-exactMatch" style="display:inline-block; width:auto; vertical-align:top;" />
+    <label for="node-input-exactMatch" style="width:70%;">Exact match</label>
+  </div>
+
+  <div class="form-row">
+    <input type="checkbox" id="node-input-caseSensitive" style="display:inline-block; width:auto; vertical-align:top;" />
+    <label for="node-input-caseSensitive" style="width:70%;">Case sensitive</label>
+  </div>
+
+  <div class="form-row">
+    <input type="checkbox" id="node-input-includeArrays" style="display:inline-block; width:auto; vertical-align:top;" />
+    <label for="node-input-includeArrays" style="width:70%;">Include arrays while traversing</label>
+  </div>
+
+  <div class="form-row">
+    <input type="checkbox" id="node-input-includeValues" style="display:inline-block; width:auto; vertical-align:top;" />
+    <label for="node-input-includeValues" style="width:70%;">Include raw values in structured outputs</label>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="object-explorer">
+  <p>
+    <b>object explorer</b> safely explores nested JavaScript data from <code>msg</code>,
+    <code>flow</code>, or <code>global</code> and returns keys, values, paths, or structured pairs.
+  </p>
+
+  <h3>What It Does</h3>
+  <p>Use this node when you need to inspect unknown or deeply nested data without writing custom JavaScript every time.</p>
+  <p>It can:</p>
+  <ul>
+    <li>list direct child keys</li>
+    <li>walk deep nested objects and arrays</li>
+    <li>filter by search text</li>
+    <li>return values or key-value pairs</li>
+    <li>prepare dropdown-friendly <code>{label, value}</code> results</li>
+  </ul>
+
+  <h3>Key, Path, and Value</h3>
+  <ul>
+    <li><b>Key</b>: the current property name only, such as <code>topics</code> or <code>updatedAt</code></li>
+    <li><b>Path</b>: the full location, such as <code>global.variables.devices[0].topics</code></li>
+    <li><b>Value</b>: the data stored at that key or path</li>
+  </ul>
+
+  <h3>Examples</h3>
+  <p><b>Example 1: direct keys from a global object</b></p>
+  <pre>Source: global
+Path: variables
+Mode: direct_keys
+Result: ["devices", "status", "settings"]</pre>
+
+  <p><b>Example 2: direct keys from a nested global path</b></p>
+  <pre>Source: global
+Path: variables.devices[0].topics
+Mode: direct_keys
+Result: ["temperature", "updatedAt", "humidity"]</pre>
+
+  <p><b>Example 3: msg.payload.fields</b></p>
+  <pre>Source: msg
+Path: payload.fields
+Mode: key_value_pairs
+Output: array of { path, key, value }</pre>
+
+  <p><b>Example 4: find matching keys anywhere below msg.payload</b></p>
+  <pre>Source: msg
+Path: payload
+Mode: matching_key_value_pairs
+Search: updatedAt
+Recursive: true</pre>
+
+  <h3>Outputs</h3>
+  <ul>
+    <li>Output 1: the main exploration result in <code>msg.payload</code></li>
+    <li>Output 2: a diagnostic status message for success, no-match, and error cases</li>
+  </ul>
+
+  <p>Helpful message fields:</p>
+  <ul>
+    <li><code>msg.payload</code>: the formatted result</li>
+    <li><code>msg.count</code>: number of matched items</li>
+    <li><code>msg.sourcePath</code>: full resolved source path</li>
+    <li><code>msg.searchTerm</code>: the search text used</li>
+    <li><code>msg.mode</code>: traversal mode used</li>
+    <li><code>msg.explorer</code>: status metadata with <code>ok</code>, <code>count</code>, <code>sourcePath</code>, and <code>message</code></li>
+    <li><code>msg.error</code>: error or no-match text when relevant</li>
+  </ul>
+
+  <h3>Notes</h3>
+  <ul>
+    <li>The node safely handles <code>null</code>, <code>undefined</code>, arrays, and circular references.</li>
+    <li>Matching compares the search term against both the key and the full path.</li>
+    <li>Deep modes walk through nested objects and arrays when <code>Include arrays</code> is enabled.</li>
+  </ul>
+</script>

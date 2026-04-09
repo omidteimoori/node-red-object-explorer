@@ -1,0 +1,49 @@
+{
+  "name": "@omidteimoori/node-red-object-explorer",
+  "version": "1.0.0",
+  "description": "A reusable Node-RED node for safely exploring nested objects from msg, flow, and global context.",
+  "license": "MIT",
+  "author": "Omid Teimoori",
+  "homepage": "https://github.com/omidteimoori/node-red-object-explorer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omidteimoori/node-red-object-explorer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omidteimoori/node-red-object-explorer/issues"
+  },
+  "keywords": [
+    "node-red",
+    "node-red-contrib",
+    "node-red-node",
+    "object",
+    "explorer",
+    "context",
+    "flow",
+    "global"
+  ],
+  "main": "nodes/object-explorer/object-explorer.js",
+  "files": [
+    "lib",
+    "nodes",
+    "verification",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "verify:runtime": "node verification/object-explorer-engine-verification.js",
+    "check:package": "npm pack --dry-run",
+    "check": "npm run verify:runtime && npm run check:package"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "node-red": ">=3.0.0"
+  },
+  "node-red": {
+    "nodes": {
+      "object-explorer": "nodes/object-explorer/object-explorer.js"
+    }
+  }
+}
